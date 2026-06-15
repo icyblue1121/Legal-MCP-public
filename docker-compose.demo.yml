@@ -1,0 +1,36 @@
+# Live grant demo: serve-http against a clean synthetic seed
+# (examples/legal-demo/seed_server_db). Proves the DB-grant authorization gate
+# end-to-end in a container — different disclosure per user, decided by the DB
+# grants alone (v0.4.0 §C). See examples/legal-demo/LIVE-DEMO.md.
+#
+# Seed the demo DB (writes data/legal-demo-server.db + .tokens.json), bring up the
+# gateway, and POST /mcp with a per-role token from the tokens file:
+#   docker compose -f docker-compose.demo.yml run --rm seed
+#   docker compose -f docker-compose.demo.yml up -d gateway
+#
+# examples/ is mounted (not baked into the image), so the seed script is available
+# without a rebuild.
+services:
+  seed:
+    image: legal-mcp:v0.5.10
+    pull_policy: never
+    volumes:
+      - ./data:/data
+      - ./examples:/app/examples:ro
+    entrypoint:
+      - python
+      - /app/examples/legal-demo/seed_server_db.py
+      - /data/legal-demo-server.db
+
+  gateway:
+    image: legal-mcp:v0.5.10
+    pull_policy: never
+    ports:
+      - "8767:8767"
+    volumes:
+      - ./data:/data
+      - ./examples:/app/examples:ro
+    command:
+      - sh
+      - -c
+      - legal-mcp serve-http --host 0.0.0.0 --port 8767 --db /data/legal-demo-server.db --audit-log /data/legal-demo-audit.jsonl

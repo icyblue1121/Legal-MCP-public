@@ -1,0 +1,50 @@
+# Mixed-source demo on the LATEST build (v0.4.6): the gateway serves the
+# `project` domain LIVE from a Feishu Bitable while contract/license stay on the
+# local SQLite seed. `build: .` builds the current source, so this always runs the
+# latest version. Feishu credentials come from the environment (env_file: .env),
+# never baked into the image or this file.
+#
+# One-time: create the demo Bitable in your Feishu space (needs FEISHU_APP_ID /
+# FEISHU_APP_SECRET in the environment and a folder you can see):
+#   export FEISHU_APP_ID=... FEISHU_APP_SECRET=...
+#   python examples/legal-demo/create_feishu_bitable.py \
+#       --folder <FOLDER_TOKEN> --write-config data/feishu-demo.connector.yaml
+#
+# Then seed governance and bring up the gateway:
+#   docker compose -f docker-compose.feishu.yml run --rm seed
+#   docker compose -f docker-compose.feishu.yml up -d gateway
+#
+# Query it (a per-role token is printed by the seed into data/.tokens.json):
+#   curl -s localhost:8767/mcp -H "Authorization: Bearer <token>" ...
+services:
+  seed:
+    build: .
+    image: legal-mcp:v0.5.10
+    pull_policy: never
+    volumes:
+      - ./data:/data
+      - ./examples:/app/examples:ro
+    entrypoint:
+      - python
+      - /app/examples/legal-demo/seed_server_db.py
+      - /data/legal-demo-server.db
+
+  gateway:
+    build: .
+    image: legal-mcp:v0.5.10
+    pull_policy: never
+    env_file:
+      - .env          # supplies FEISHU_APP_ID / FEISHU_APP_SECRET (and others)
+    ports:
+      - "8767:8767"
+    volumes:
+      - ./data:/data
+      - ./examples:/app/examples:ro
+    command:
+      - sh
+      - -c
+      - >
+        legal-mcp serve-http --host 0.0.0.0 --port 8767
+        --db /data/legal-demo-server.db
+        --audit-log /data/legal-demo-audit.jsonl
+        --connector /data/feishu-demo.connector.yaml

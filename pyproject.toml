@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "legal-mcp"
+version = "0.5.10"
+description = "Open-source, self-hosted, permission-aware MCP gateway with field-level authorization and disclosure audit."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.11"
+authors = [
+  { name = "Legal-MCP contributors" }
+]
+dependencies = []
+
+[project.optional-dependencies]
+agent = [
+  "langchain>=1.0",
+  "langgraph>=1.0",
+  "langgraph-checkpoint-sqlite>=3.0.1",
+  "langchain-openai>=1.2",
+  "langfuse>=3",
+]
+# Optional formats for the local_file connector (v0.5.5). The core stays
+# dependency-free; XLSX needs openpyxl and Markdown frontmatter needs PyYAML —
+# both lazy-imported, so CSV/JSON/JSONL work with the standard library alone.
+local-file = [
+  "openpyxl>=3",
+  "pyyaml>=6",
+]
+
+[project.scripts]
+legal-mcp = "legal_mcp.cli:main"
+
+[dependency-groups]
+dev = [
+  "pytest>=8",
+  "pyyaml>=6"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+legal_mcp = ["schema.sql"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

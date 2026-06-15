@@ -1,0 +1,4 @@
+services:
+  legal-mcp:
+    build: .
+    image: legal-mcp:v0.5.10

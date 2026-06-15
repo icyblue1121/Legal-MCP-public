@@ -1,0 +1,25 @@
+.DS_Store
+.env
+.venv/
+.pytest_cache/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.worktrees/
+.agents/
+.codegraph/
+build/
+# Docs are local by default (historical plans contain real client data).
+# Allowlist only curated, scrubbed dirs for tracking.
+Docs/**
+!Docs/strategy/
+!Docs/strategy/**
+*.db
+*.sqlite
+*.sqlite3
+*.jsonl
+data/**
+!data/
+!data/**/
+!data/**/.gitkeep
+tests/fixtures/

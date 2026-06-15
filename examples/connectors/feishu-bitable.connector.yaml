@@ -1,0 +1,69 @@
+# Example read-through connector config — mix a real Feishu Bitable with the
+# local SQLite demo (pivot v0.3). Pass it with:
+#
+#     legal-mcp serve-http --db data/legal-demo-server.db \
+#       --connector examples/connectors/feishu-bitable.connector.yaml
+#
+# What it does:
+#   * the `project` domain is served LIVE from a Feishu Bitable table;
+#   * every other domain (contract, license, cross_domain) keeps coming from the
+#     local SQLite demo — this is the "mixed database" the gateway answers over.
+#
+# Security posture:
+#   * Only the fields declared below are queryable — an undeclared Bitable column
+#     can never be returned, even if the table has it.
+#   * Secrets are NOT in this file. app_id / app_secret are read from the
+#     environment, so this file is safe to commit and review in a pull request.
+#   * Authorization (DB-grant field gate + record scope) and audit stay in the
+#     gateway, around the connector. The connector is a dumb read pipe.
+#
+# Identity binding: a Bitable row's `project_code` must match a `project_code` in
+# the gateway's governance DB (the `projects` table). Record-scope visibility is
+# computed from governance grants and applied to the Feishu rows by that code.
+#
+# Before running, export the credentials of a Feishu custom app that can read the
+# Bitable (Open Platform -> your app -> Credentials):
+#
+#     export FEISHU_APP_ID=cli_xxxxxxxxxxxxxxxx
+#     export FEISHU_APP_SECRET=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+version: 1
+sources:
+  - type: feishu_bitable
+    # Non-secret resource id of the Bitable app (the `bascn…` / `…bascnXXXX`
+    # token in the Bitable URL). Inline is fine; or use `app_token_env: NAME`.
+    app_token: bascnReplaceWithYourAppToken
+    # Env var names holding the app credentials (these defaults can be omitted).
+    app_id_env: FEISHU_APP_ID
+    app_secret_env: FEISHU_APP_SECRET
+    # Optional: override for Feishu/Lark international (default open.feishu.cn).
+    # base_url: https://open.larksuite.com
+    domains:
+      - name: project
+        # The table id (`tbl…`) of the Bitable table backing the project domain.
+        table_id: tblReplaceWithYourTableId
+        fields:
+          # `is_identity` fields are exempt from the field gate (they are how a
+          # record is named/referenced) and one of them — project_code — carries
+          # the row's project identity used for record-scope filtering.
+          - {name: project_code, is_identity: true, aliases: ["项目代号", "项目编号"]}
+          - {name: name, is_identity: true, aliases: ["项目名称", "游戏名称"]}
+          - {name: contact_person, aliases: ["对接人", "联系人"]}
+          - {name: legal_bp, aliases: ["法务BP", "法务bp", "法务"]}
+      - name: seal
+        # 公司印章管理表。按保管人邮箱做 by_owner 行级范围：保管人只能查到
+        # 自己负责的公司印章状态。
+        table_id: tblReplaceWithYourSealTableId
+        record_scope: {mode: by_owner, field: custodian_email, subject: email}
+        fields:
+          - {name: company, is_identity: true, aliases: ["公司", "公司名称"]}
+          - {name: seal_type, is_identity: true, aliases: ["印章类型", "章类型"]}
+          - {name: custodian, aliases: ["保管人"]}
+          - {name: custodian_email, aliases: ["保管人邮箱"]}
+          - {name: storage_location, aliases: ["保管地点", "存放地点"]}
+          - {name: status, aliases: ["现在状态", "当前状态", "印章状态"]}
+          - {name: borrower, aliases: ["外借人", "借用人"]}
+          - {name: borrowed_at, aliases: ["外借时间", "借出时间"]}
+          - {name: borrow_reason, aliases: ["外借原因", "借用原因"]}
+          - {name: expected_return_at, aliases: ["预计归还时间"]}
+          - {name: actual_return_at, aliases: ["实际归还时间"]}

@@ -1,0 +1,10 @@
+company,unified_social_credit_code,seal_type,custodian,storage_location,status,borrower,borrowed_at,borrow_reason,expected_return_at,actual_return_at
+上海青岚科技有限公司,91310000QINGLAN01X,公章,Alice Chen,上海总部 18F 法务保险柜 A01,在手中,,,,,
+上海青岚科技有限公司,91310000QINGLAN01X,合同章,Alice Chen,上海总部 18F 法务保险柜 A02,外借中,王浩,2026-06-12 10:30,OA-20260612-001 线下签署渠道合作协议,2026-06-13 18:00,
+上海青岚科技有限公司,91310000QINGLAN01X,财务章,Alice Chen,上海总部 18F 财务保险柜 F01,在手中,,,,,
+北京星河互动有限公司,91110000STAR0002X,公章,Alice Chen,北京分部 9F 行政保险柜 B01,在手中,,,,,
+北京星河互动有限公司,91110000STAR0002X,合同章,Alice Chen,北京分部 9F 行政保险柜 B02,在手中,,,,,
+北京星河互动有限公司,91110000STAR0002X,财务章,Alice Chen,北京分部 9F 财务保险柜 BF01,外借中,刘敏,2026-06-11 15:00,OA-20260611-004 银行开户材料补盖章,2026-06-12 17:00,
+深圳云舟网络有限公司,91440300YUNZHOU03X,公章,Bob Li,深圳办公室 12F 法务保险柜 S01,在手中,,,,,
+深圳云舟网络有限公司,91440300YUNZHOU03X,合同章,Bob Li,深圳办公室 12F 法务保险柜 S02,外借中,赵强,2026-06-12 09:15,OA-20260612-006 供应商补充协议用印,2026-06-14 12:00,
+深圳云舟网络有限公司,91440300YUNZHOU03X,财务章,Bob Li,深圳办公室 12F 财务保险柜 SF01,在手中,,,,,
